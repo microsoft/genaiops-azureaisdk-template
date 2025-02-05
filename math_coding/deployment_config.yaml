@@ -1,9 +1,9 @@
 name: math_coding
 description: "This is a math coding experiment"
 type: function_app
-resource_group: rg-mint-bonefish
-service_name: rg-mint-bonefish
-app_name: rg-mint-bonefish
+resource_group: rg-holy-terrier
+service_name: rg-holy-terrier
+app_name: rg-holy-terrier
 function_name: process_math
 runtime: python
 version: 3.11

@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from llmops.experiment import load_experiment
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
         # Log to console

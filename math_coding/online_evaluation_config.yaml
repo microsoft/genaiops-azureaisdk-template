@@ -1,5 +1,5 @@
 schedule_name: math_coding_schedule
-app_insights_name: gbbappinsights
+app_insights_name: amltest3246777597
 service_name: math-coding-chat
-deployment_name: gpt-4o-mini
-deployment_api_version: 2024-06-01
+deployment_name: gpt-4o
+deployment_api_version: 2024-08-06

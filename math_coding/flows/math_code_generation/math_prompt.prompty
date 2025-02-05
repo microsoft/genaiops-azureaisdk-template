@@ -7,7 +7,7 @@ authors:
 model:
   api: chat
   configuration:
-    azure_deployment: gpt-4o-mini
+    azure_deployment: gpt-4o
   parameters:
     temperature: 1
     frequency_penalty: 0.5

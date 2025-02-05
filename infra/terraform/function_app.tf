@@ -19,7 +19,7 @@ resource "azurerm_service_plan" "simpleapp_service_plan" {
   name                = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  sku_name            = "P0v3"
+  sku_name            = "B3"
   os_type             = "Linux"
 }
 resource "azurerm_linux_function_app" "simpleapp_app" {

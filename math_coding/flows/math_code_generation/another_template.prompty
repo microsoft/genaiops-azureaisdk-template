@@ -7,7 +7,7 @@ authors:
 model:
   api: chat
   configuration:
-    azure_deployment: gpt-4o-mini
+    azure_deployment: gpt-4o
   parameters:
     temperature: 0.7
     frequency_penalty: 0.5
@@ -16,7 +16,7 @@ model:
 system:
 I want you to act as a Math expert specializing in Algebra, Geometry, and Calculus. Given the question, develop python code to model the user's question.
 The python code will print the result at the end.
-Please generate executable python code, your reply will be in JSON format, something like:
+Please generate executable python code, your reply will be in JSON format, something like (only JSON, no prefix or suffix):
 {
     "code": "print(1+1)"
 }

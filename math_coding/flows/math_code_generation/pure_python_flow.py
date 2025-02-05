@@ -9,6 +9,19 @@ from azure.ai.inference import ChatCompletionsClient
 from azure.ai.inference.prompts import PromptTemplate
 from azure.core.credentials import AzureKeyCredential
 
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        # Log to console
+        logging.StreamHandler(),
+        # Also log to a file, keeping track of all runs
+        logging.FileHandler('experiment_execution.log')
+    ]
+)
+logger = logging.getLogger(__name__)
 
 def infinite_loop_check(code_snippet):
     """Check if the code snippet has an infinite loop"""
@@ -42,6 +55,10 @@ def error_fix(code_snippet):
 def code_refine(original_code: str) -> str:
     """Refine the code snippet by fixing infinite loops and syntax errors"""
     try:
+        if original_code.startswith("```"):
+            original_code= original_code[7:-3].strip()
+            logger.debug(f"=============== Code  {original_code}")
+
         original_code = json.loads(original_code)["code"]
         fixed_code = None
 
@@ -96,6 +113,8 @@ def get_math_response(question):
     path = f"./{prompty_file}"
     prompt_template = PromptTemplate.from_prompty(file_path=path)
 
+    logger.debug(f"===== RUNNING PROMPTY {prompty_file}")
+
     messages = prompt_template.create_messages(question=question)
     client = ChatCompletionsClient(
         endpoint=endpoint,
@@ -107,6 +126,8 @@ def get_math_response(question):
         model=prompt_template.model_name,
         **prompt_template.parameters,
     )
+
+    logger.debug(f" OUTPUT ==================   {code.choices[0]}")
 
     code_refined = code_refine(code.choices[0].message.content)
     output = func_exe(code_refined)
