@@ -59,8 +59,8 @@ This documentation provides a step-by-step guide to setting up, running, and man
 5. [GitHub Execution](#5-github-execution)
 6. [Configuration Files](#6-configuration-files)
 7. [Environment Variables](#7-environment-variables)
-8. [GitHub Workflows](#8-github-workflows)
-9. [Best Practices](#9-best-practices)
+8. [Best Practices](#8-best-practices)
+9. [Infrastructure Deployment with Terraform](#9-infrastructure-deployment-with-terraform)
 
 ---
 
