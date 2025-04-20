@@ -1,0 +1,5 @@
+schedule_name: math_coding_schedule
+app_insights_name: gbbappinsights
+service_name: math-coding-chat
+deployment_name: gpt-4o-mini
+deployment_api_version: 2024-06-01

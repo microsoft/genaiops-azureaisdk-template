@@ -115,6 +115,6 @@ def get_math_response(question):
 
 if __name__ == "__main__":
     # Test the math response
-    QUESTION = "what is 10 + 20?"
+    QUESTION = "what is 10 + 50?"
     result = get_math_response(QUESTION)
     print(result)

@@ -19,5 +19,5 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["llmops", "tests", "math_coding", "lib", "math_coding_agent"]
+packages = ["llmops", "tests", "math_coding", "lib", "math_coding_agent","math_coding_agent_semantic_kernel"]
 include-package-data = true

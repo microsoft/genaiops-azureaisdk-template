@@ -1,0 +1,16 @@
+name: math_coding_agent_semantic_kernel
+description: "This is a math coding agent experiment with semantic kernel and Azure AI Agents"
+type: function_app
+resource_group: rg-rich-mullet
+service_name: rg-rich-mullet
+app_name: rg-rich-mullet
+function_name: math_coding_agent_semantic_kernel
+runtime: python
+version: 3.11
+location: eastus
+env_vars:
+  - GPT4O_DEPLOYMENT_NAME
+  - GPT4O_API_KEY
+  - AOAI_API_KEY
+  - AZURE_AI_CHAT_ENDPOINT
+  - AZURE_AI_CHAT_KEY

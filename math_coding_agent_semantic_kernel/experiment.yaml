@@ -1,0 +1,97 @@
+name: math_coding_agent_semantic_kernel
+description: "This is a math coding experiment with semantic kernel and Azure AI Agents"
+flow: flows/math_code_generation
+entry_point: pure_python_flow:get_math_response
+connections_ref:
+  - aoai
+  - gpt4o
+env_vars:
+  - env_var1: "value1"
+  - env_var2: ${GPT4O_API_KEY}
+  - PROMPTY_FILE: another_template.prompty
+
+connections:
+  - name: aoai
+    connection_type: AzureOpenAIConnection
+    api_base: https://demoopenaiexamples.openai.azure.com/
+    api_version: 2023-07-01-preview
+    api_key: ${AOAI_API_KEY}
+    api_type: azure
+    deployment_name: ${GPT4O_DEPLOYMENT_NAME}
+  - name: gpt4o
+    connection_type: AzureOpenAIConnection
+    api_base: https://demoopenaiexamples.openai.azure.com/
+    api_version: 2023-07-01-preview
+    api_key: ${GPT4O_API_KEY}
+    api_type: azure
+    deployment_name: ${GPT4O_DEPLOYMENT_NAME}
+  - name: aoai1
+    connection_type: AzureOpenAIConnection
+    api_base: https://demoopenaiexamples.openai.azure.com/
+    api_version: 2023-07-01-preview
+    api_key: ${AOAI_API_KEY}
+    api_type: azure
+    deployment_name: ${GPT4O_DEPLOYMENT_NAME}
+  - name: gpt4o1
+    connection_type: AzureOpenAIConnection
+    api_base: https://demoopenaiexamples.openai.azure.com/
+    api_version: 2023-07-01-preview
+    api_key: ${GPT4O_API_KEY}
+    api_type: azure
+    deployment_name: ${GPT4O_DEPLOYMENT_NAME}
+
+evaluators:
+- name: eval_agent_score
+  flow: evaluations
+  entry_point: pure_python_flow:get_math_response
+  connections_ref:
+    - aoai1
+    - gpt4o1
+  env_vars:
+    - env_var3: "value1"
+    - env_var4: ${GPT4O_API_KEY}
+    - ENABLE_TELEMETRY: True
+  datasets:
+    - name: eval_agent_score_test
+      source: data/eval_agent_score.jsonl
+      description: "This dataset is for evaluating flows."
+      mappings:
+        total_message_count: "${data.total_message_count}"
+        user_message_count: "${data.user_message_count}"
+        assistant_message_count: "${data.assistant_message_count}"
+        time_difference: "${data.time_difference}"
+        full_output: "${target.full_output}"
+- name: eval_f1_score
+  flow: evaluations
+  entry_point: pure_python_flow:get_math_response
+  connections_ref:
+    - aoai1
+    - gpt4o1
+  env_vars:
+    - env_var3: "value1"
+    - env_var4: ${GPT4O_API_KEY}
+    - ENABLE_TELEMETRY: True
+  datasets:
+    - name: math_coding_test
+      source: data/math_data.jsonl
+      description: "This dataset is for evaluating flows."
+      mappings:
+        ground_truth: "${data.answer}"
+        response: "${target.response}"
+- name: eval_len_score
+  flow: evaluations
+  entry_point: pure_python_flow:get_math_response
+  connections_ref:
+    - aoai1
+    - gpt4o1
+  env_vars:
+    - env_var3: "value1"
+    - env_var4: ${GPT4O_API_KEY}
+    - ENABLE_TELEMETRY: True
+  datasets:
+    - name: math_coding_len_test
+      source: data/math_data_len.jsonl
+      description: "This dataset is for evaluating flows."
+      mappings:
+        ground_truth: "${data.answer}"
+        response: "${target.response}"

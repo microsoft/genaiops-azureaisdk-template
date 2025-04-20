@@ -12,5 +12,6 @@ opentelemetry-instrumentation-requests
 opentelemetry-instrumentation-fastapi
 opentelemetry-instrumentation-urllib
 opentelemetry-instrumentation-urllib3
+semantic-kernel
 
 

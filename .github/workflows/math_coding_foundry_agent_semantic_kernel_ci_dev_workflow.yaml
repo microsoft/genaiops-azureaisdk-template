@@ -1,0 +1,48 @@
+name: math_coding_foundry_agent_semantic_kernel_ci_dev_workflow
+
+on:
+  workflow_call:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      use_case_base_path:
+        type: string
+        description: "The flow usecase to execute"
+        required: true
+        default: "math_coding_agent_semantic_kernel"
+  workflow_dispatch:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      use_case_base_path:
+        type: string
+        description: "The flow usecase to execute"
+        required: true
+        default: "math_coding_agent_semantic_kernel"
+  push:
+    branches:
+      - main
+      - development
+    paths:
+      - 'math_coding_agent_semantic_kernel/**'
+      - '.github/**'
+      - 'llmops/**'
+      - 'lib/**'
+
+#=====================================
+# Execute platform_ci_dev_workflow workflow for experiment, evaluation and deployment of flows
+#=====================================
+jobs:
+  execute-platform-flow-ci:
+    uses: ./.github/workflows/platform_ci_dev_workflow.yaml
+    secrets: inherit
+    with:
+      env_name: ${{ inputs.env_name || 'dev'}}
+      use_case_base_path: ${{ inputs.use_case_base_path || 'math_coding_agent_semantic_kernel' }}
+    
