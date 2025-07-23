@@ -10,5 +10,6 @@ azure-ai-projects
 azure-ai-inference[prompts]
 azure-mgmt-web>=7.3.1
 azure-mgmt-resource>=23.2.0
+requests>=2.25.0
 semantic-kernel[azure]
 semantic-kernel[all]

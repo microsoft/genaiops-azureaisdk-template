@@ -5,10 +5,14 @@ import datetime
 import importlib
 import inspect
 import os
+import re
 import sys
-from typing import Optional
+from typing import Dict, Optional
 import logging
+import requests
 from dotenv import load_dotenv
+from azure.ai.projects import AIProjectClient
+from azure.identity import DefaultAzureCredential
 
 from llmops.experiment import load_experiment
 
@@ -23,6 +27,54 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+
+def extract_run_id(url):
+    """Extract run ID from Azure ML studio URL."""
+    match = re.search(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}', url)
+    return match.group(0) if match else None
+
+
+def update_run_tags(
+    subscription_id: str,
+    resource_group_name: str,
+    workspace_name: str,
+    workspace_location: str,
+    run_id: str,
+    tags: Dict[str, str],
+    credential: Optional[object] = None
+):
+    """Workaround to update tags since the SDK is not supporting it yet."""
+    try:
+        if credential is None:
+            credential = DefaultAzureCredential()
+
+        token = credential.get_token("https://management.azure.com/.default").token
+
+        url = (f"https://{workspace_location}.api.azureml.ms/history/v1.0"
+               f"/subscriptions/{subscription_id}"
+               f"/resourceGroups/{resource_group_name}"
+               f"/providers/Microsoft.MachineLearningServices"
+               f"/workspaces/{workspace_name}"
+               f"/runs/{run_id}")
+
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "tags": tags
+        }
+
+        response = requests.patch(url, headers=headers, json=payload)
+
+        if response.status_code != 200:
+            raise RuntimeError(f"API request failed with status {response.status_code}: {response.text}")
+        logger.info("Successfully updated tags for run ID: %s", run_id)
+
+    except Exception as e:
+        logger.error("Failed to update run tags: %s", str(e))
 
 
 def set_environment_variables(env_dict):
@@ -231,10 +283,55 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    prepare_and_execute(
+    project = None
+    if os.environ.get("AZURE_AI_PROJECT_CONNECTION_STRING"):
+        project = AIProjectClient.from_connection_string(
+            conn_str=os.environ["AZURE_AI_PROJECT_CONNECTION_STRING"],
+            credential=DefaultAzureCredential()
+        )
+
+    results = prepare_and_execute(
         exp_filename=args.experiment_config_file,
         base_path=args.base_path,
         env_name=args.environment_name,
         report_dir=args.report_dir,
         eval_to_exec=args.eval_to_exec,
     )
+
+    # Workaround: Apply tags to evaluation runs until SDK supports tagging natively
+    if project and results:
+        for res in results:
+            try:
+                if ("result" in res and "rows" in res["result"] and 
+                    len(res["result"]["rows"]) > 0 and
+                    "studio_url" in res["result"]):
+                    
+                    evaluation_tags = {}  # Add custom tags here as needed
+                    
+                    if "outputs" in res["result"]["rows"][0]:
+                        outputs = res["result"]["rows"][0]["outputs"]
+                        if isinstance(outputs, dict) and "model" in outputs:
+                            evaluation_tags["model"] = outputs["model"]
+                        elif hasattr(outputs, 'model'):
+                            evaluation_tags["model"] = outputs.model
+
+                    run_id = extract_run_id(res["result"]["studio_url"])
+                    if run_id:
+                        workspace_scope = project.scope
+                        update_run_tags(
+                            workspace_scope["subscription_id"],
+                            workspace_scope["resource_group_name"],
+                            workspace_scope["project_name"],
+                            "eastus2",
+                            run_id,
+                            evaluation_tags
+                        )
+                    else:
+                        logger.warning("Could not extract run ID from studio URL")
+            except Exception as e:
+                logger.error("Failed to apply tags to result: %s", str(e))
+    else:
+        if not project:
+            logger.info("Azure AI Project Client not initialized - skipping tagging")
+        if not results:
+            logger.info("No results to tag")
